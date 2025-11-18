@@ -1,0 +1,141 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+
+  <div id = "ordered_items" class="container mt-5 mb-5">
+    <div class="row d-flex justify-content-center">
+
+    <main class="col-md-10 text-center">
+        <h2 class="">Your Addresses</h2>
+
+        <div class="table-responsive mt-5 mb-5">
+          <!--Table-->
+          <table class="table table-striped">
+        
+        
+        
+            <tbody>
+              <tr>
+
+                <td>Address</td>
+                <td>Phone Number</td>
+                <td>Email</td>
+                <td>City</td>
+                <td>Post Code</td>
+                <td>Country</td>
+                <td>state</td>
+                <td>Edit</td>
+                <td>Delete</td>
+              </tr>
+              {% for user_address in user_addresses %}
+
+              <tr>
+
+                <td>{{ user_address.address }}</td>
+
+                <td>{{ user_address.phone_number }}</td>
+                <td>{{ user_address.email }}</td>
+
+                <td>{{user_address.city}}</td>
+                <td>{{user_address.post_code}}</td>
+                <td>{{user_address.country}}</td>
+                <td>{{user_address.state}}</td>
+                <td><a href="{% url 'my_account_address_edit' user_address.id %}"><button type="button" class="btn btn-outline-primary">EDIT</button></a></td>
+                <td><button onclick="delete_order('{{user_address.id}}')" type="button" class="btn btn-outline-danger">DELETE</button></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <!--Table-->
+        </div>
+
+    </main>
+  </div> <!-- row.// -->
+  </div>
+  
+  
+  </section>
+  <!-- ========================= SECTION CONTENT END// ========================= -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+
+  <script>
+
+    /* cancel order */
+
+    function delete_order(id){
+
+      var data = {
+    
+          'address_id' :id,
+          'csrf_token' : '{{csrf_token}}',
+    
+      }
+      swal({
+        title: "Are you sure?",
+        text: "Once Deleted, you will not be able to retrive the address!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+    
+    
+          $.ajax({
+            url:"{% url 'delete_address' %}",
+            type:"POST",
+            data: data,
+              dataType: "html",
+              success: function () {
+                  $("#ordered_items").load(location.href + " #ordered_items");            
+        
+              }
+        
+          });
+          
+          swal("You deleted your address!", {
+            icon: "success",
+          });
+        } else {
+          swal("Your address is safe!");
+        }
+      });
+    
+    
+    }
+
+
+
+  $('.list-group-item').click(function() {
+    $(this).removeClass('list-group-item');
+    $(this).addClass('list-group-item active');
+});
+
+
+$('.list-group-item active').click(function() {
+  $(this).removeClass('list-group-item active');
+  $(this).addClass('list-group-item');
+});
+
+
+
+
+
+  </script>
+
+  
+  
+
+  
+
+
+
+
+{% endblock %}
+

@@ -1,0 +1,165 @@
+{% extends 'user/base.html' %}
+
+
+{% block content %}
+
+<div class="breadcrumbs">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 col-md-6 col-12">
+        <div class="breadcrumbs-content">
+          <h1 class="page-title">Order Details</h1>
+        </div>
+      </div>
+      <div class="col-lg-6 col-md-6 col-12">
+        <ul class="breadcrumb-nav">
+          <li>
+            <a href="index.html"><i class="lni lni-home"></i>Home</a>
+          </li>
+          <li><a href="index.html">Cart</a></li>
+
+          <li><a href="index.html">Checkout</a></li>
+          <li>Order Details</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container mt-5 mb-5">
+    <div class="row order-success text-center font-weight-bolder text-dark border border-light mt-5 mb-5">
+        
+        <p class="h1 p-5 " > <i class="lni lni-checkmark"></i> Thank you. Your order has been received.</p>
+
+
+
+  
+    </div>
+
+    <!-- <div class="row">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Order ID</th>
+            <th scope="col">Payment Method</th>
+            <th scope="col">Order Status</th>
+            <th scope="col">Delivery Address</th>
+            <th scope="col">Grand Total</th>
+
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{{order_id}}</th>
+            <td>{{payment_method}}</td>
+            <td>{{order_status}}</td>
+            <td>{{order_address}}</td>
+            <td>{{grand_total}}</td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div> -->
+
+    <div class="row justify-content-center">
+      <main class="col-md-10">
+
+        <article class="card mt-5 mb-5">
+        <header class="card-header">
+          <strong class="d-inline-block mr-3">Order ID: {{order_id}}</strong>
+          <br>
+          <span>Order Status: {{order_status}}</span>
+        </header>
+        <div class="card-body">
+          <div class="row"> 
+            <div class="col-md-8">
+              <h6 class="text-muted">Delivery to</h6>
+              <p>{{order_address}} <br>  
+                
+               </p>
+            </div>
+            <div class="col-md-4">
+              <h6 class="text-muted">Payment Method :</h6>
+  
+  
+  
+              <span class="text-success">
+                <i class="fab fa-lg fa-cc-visa"></i>
+                  {{payment_method}}
+              </span>
+              <p><br>
+               <span class="b">Grand Total: ₹ {{grand_total}} </span>
+              </p>
+            </div>
+          </div> <!-- row.// -->
+        </div> <!-- card-body .// -->
+        <div class="table-responsive">
+        <table class="table table-hover">
+  
+        {% for sub_order in sub_orders %}
+
+          {% for product in products %}
+
+
+            {% if sub_order.order.id == order_id_id %}
+
+
+              {% if product.id == sub_order.products_id.id %}
+
+              <tr>
+                <td width="65">
+                  <img src="{{product.product_cover.url}}" class="img-xs border">
+                </td>
+                <td> 
+                  <p class="title mb-0">{{product.product_name}} </p>
+                  <var class="price text-muted">INR {{product.sale_price}}</var>
+                </td>
+                <td> Quantity : {{sub_order.quantity}} </td>
+                <td width="250"> <a href="{% url 'single_product_view' product.id %}" class="btn btn-outline-primary">Details</a></td>
+              </tr>
+
+              {% endif %}
+
+            {% endif %}
+
+          {% endfor %}
+          
+        {% endfor %}
+            
+  
+  
+        </table>
+        </div> <!-- table-responsive .end// -->
+        </article> <!-- order-group.// --> 
+  
+      </main>
+    </div>
+    <div class="row text-center mt-5 mb-5">
+
+      <h3>You will be automatically redirected to Home page in 10 sec.....</h3>
+
+    </div>
+    <div class="row text-center mt-5 mb-5">
+      <div class="col-12">
+        <a href="{% url 'home' %}"><button type="button" class="btn btn-primary">Home</button></a>
+        &nbsp;
+        &nbsp;
+        <a href="{% url 'my_orders' %}"><button type="button" class="btn btn-primary">My Order's</button></a>
+
+
+      </div>
+   
+
+
+
+    </div>
+</div>
+
+<script>
+  setTimeout(function(){
+    window.location.href = "{% url 'home' %}";
+ }, 10000);
+</script>
+
+{% endblock %}

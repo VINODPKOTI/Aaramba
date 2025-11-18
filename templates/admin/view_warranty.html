@@ -1,0 +1,119 @@
+{% extends 'admin/adminbase.html' %}
+
+{% block content %}
+<div class="main-content">
+    <div class="page-content">
+        <div class="container-fluid">
+            <!-- start page title -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                        <h4 class="mb-sm-0 font-size-18">Warranties</h4>
+                        <div class="page-title-right">
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item"><a href="javascript: void(0);">Ecommerce</a></li>
+                                <li class="breadcrumb-item active">Warranties</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end page title -->
+            <div class="row" id="warranty_div_id">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-sm-4">
+                                    <form method="get">
+                                        <div class="search-box me-2 mb-2 d-inline-block">
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control" name="search" placeholder="Search...">
+                                                <i class="bx bx-search-alt search-icon"></i>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table align-middle table-nowrap table-check">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 20px;" class="align-middle">
+                                                <div class="form-check font-size-16">
+                                                    <input class="form-check-input" type="checkbox" id="checkAll">
+                                                    <label class="form-check-label" for="checkAll"></label>
+                                                </div>
+                                            </th>
+                                            <th class="align-middle">Order ID</th>
+                                            <th class="align-middle">Product</th>
+                                            <th class="align-middle">Start Date</th>
+                                            <th class="align-middle">End Date</th>
+                                            <th class="align-middle">Status</th>
+                                            <th class="align-middle">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for warranty in warranties %}
+                                        <tr>
+                                            <td>
+                                                <div class="form-check font-size-16">
+                                                    <input class="form-check-input" type="checkbox" id="warrantyidcheck{{warranty.id}}">
+                                                    <label class="form-check-label" for="warrantyidcheck{{warranty.id}}"></label>
+                                                </div>
+                                            </td>
+                                            <td>{{warranty.order.order_id}}</td>
+                                            <td>{{warranty.product.product_name}}</td>
+                                            <td>{{warranty.start_date}}</td>
+                                            <td>{{warranty.end_date}}</td>
+                                            <td>
+                                                {% if warranty.is_valid %}
+                                                    <span class="badge badge-pill badge-soft-success font-size-12">Valid</span>
+                                                {% else %}
+                                                    <span class="badge badge-pill badge-soft-danger font-size-12">Expired</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'delete_warranty' warranty.id %}" class="btn btn-danger btn-sm btn-rounded">Delete</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <ul class="pagination pagination-rounded justify-content-end mb-2">
+                                <!-- Pagination, if needed -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end row -->
+        </div> <!-- container-fluid -->
+    </div>
+    <!-- End Page-content -->
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <script>document.write(new Date().getFullYear())</script> © YourCompany.
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end d-none d-sm-block">
+                        Design & Develop by <a href="#!" class="text-decoration-underline">YourCompany</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+<script>
+    document.getElementById('checkAll').onclick = function() {
+        var checkboxes = document.querySelectorAll('.form-check-input');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    }
+</script>
+<!-- end main content-->
+{% endblock %}

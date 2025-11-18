@@ -1,0 +1,68 @@
+<!-- templates/user/validate_warranty.html -->
+{% extends 'user/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="breadcrumbs">
+        <div class="row align-items-center">
+            <div class="col-lg-6 col-md-6 col-12">
+                <div class="breadcrumbs-content">
+                    <h1 class="page-title">My Warranties</h1>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-12">
+                <ul class="breadcrumb-nav">
+                  <li>
+                    <a href="index.html"><i class="lni lni-home"></i> Home</a>
+                  </li>
+                  <li><a href="index.html">Shop</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% if warranties %}
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">My Warranties</h3>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Product Name</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for warranty in warranties %}
+                                        <tr>
+                                            <td>{{ warranty.order.order_id }}</td>
+                                            <td>{{ warranty.product.product_name }}</td>
+                                            <td>{{ warranty.start_date }}</td>
+                                            <td>{{ warranty.end_date }}</td>
+                                            <td>
+                                                {% if warranty.is_valid %}
+                                                    <span >Valid</span>
+                                                {% else %}
+                                                    <span >Expired</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p>No warranties found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
