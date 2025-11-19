@@ -30,6 +30,7 @@ def _session_id(request):
 def login(request):
     if request.session.has_key('userlogin'):
         product = Products.objects.all()
+        #this is imouratbt
         return render(request,'user/home.html', {'products': product})
     else: 
         if request.method == 'POST':
