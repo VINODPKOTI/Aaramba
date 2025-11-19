@@ -45,26 +45,28 @@
 
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Image Name</label>
-                                        <input class="form-control" name="banner_image" type="file" id="banner_image_id" placeholder="Default input">
+                                        <input class="form-control" name="banner_image" type="file" id="banner_image_id" placeholder="Default input" required>
                                         <span class="error_form" id="banner_image_error_message"></span>
 
                                     </div>
 
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Product</label>
-                                        <select class="form-select" aria-label="Default select example" name="product_selected" id="product_select_id">
-                                          <option selected>Open this select menu</option>
+                                        <select class="form-select" aria-label="Default select example" name="product_selected" id="product_select_id" required>
+                                            <option value="" selected disabled>Open this select menu</option>
                                           {% for product in products %}
                                           <option value="{{product.id}}" >{{product.product_name}}</option>
                                           {% endfor %}
                                         </select>
+                                        <span class="error_form" id="product_error_message"></span>
+
 
 
                                     </div>
 
                                     <div class="mb-4">
                                       <label for="productdesc">Product Description</label>
-                                      <textarea  name = 'product_description' class="form-control" id="productdescription" rows="5"></textarea>
+                                      <textarea  name = 'product_description' class="form-control" id="productdescription" rows="5" required></textarea>
                                       <span class="error_form" id="image_description_error_message"></span>
 
                                     </div>
@@ -199,7 +201,11 @@
      
          });
      
-     })
+     });
+
+
+
+
 </script>
 
 
