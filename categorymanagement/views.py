@@ -29,90 +29,83 @@ def category(request):
 @never_cache
 def add_category(request):
     if request.method == 'POST':
-        category_name = request.POST['category_name'].lower()
-        slug = category_name.replace(" ", "-").lower()
-        description = request.POST['description'].lower()
-
-        if Category.objects.filter(category_name = category_name).exists():
+        # Store original values (NO lowercase)
+        category_name = request.POST['category_name']
+        slug = category_name.replace(" ", "-")
+        description = request.POST['description']
+        # Lowercase only for comparison
+        category_name_lower = category_name.lower()
+        # Case-insensitive duplicate check
+        if Category.objects.filter(category_name__iexact=category_name).exists():
             messages.info(request, 'Category Already Exist')
             return redirect('add_category')
-        else:
-            Category.objects.create(category_name = category_name, 
-                    slug = slug,
-                    description = description,  )
+        # Create category with ORIGINAL data
+        Category.objects.create(
+            category_name = category_name,   # original case
+            slug = slug,                     # original case
+            description = description,       # original case
+        )
+        return redirect('category')
+    return render(request, 'admin/add_category.html')
 
-            return redirect('category')
-
-
-    else:
-        offers = Offer.objects.all()
-        context = {
-            'offers' : offers
-        }
-        return render(request,'admin/add_category.html', context)
 
 
 # EDIT CATEGORY
 
 @never_cache
 def edit_category(request, id):
+    category = Category.objects.get(id=id)
+
     if request.method == 'POST':
-        category = Category.objects.get(id = id)
-        category_name = request.POST['category_name'].lower()
-        slug = category_name.replace(" ", "-").lower()
-        description = request.POST['description'].lower()
 
-        if request.POST.get('offer_id') == 'none':
-            offer_name = None
-            offer_percent = None
-            expiry_date = None
-            offer_status = 'False'
+        # Raw values (DO NOT lowercase)
+        category_name = request.POST['category_name']
+        slug = category_name.replace(" ", "-")
+        description = request.POST['description']
 
-        else:
-            offer_id = request.POST['offer_id']
-            offer  = Offer.objects.get(id = offer_id)
-            offer_name = offer.offer_name
-            offer_percent = offer.offer_percent
-            expiry_date = offer.expiry_date
-            offer_status = 'True'
+        # LOWERCASE only for checking duplicates
+        category_name_lower = category_name.lower()
 
+        # ---- OFFER LOGIC ----
+        offer_id = request.POST.get('offer_id')
 
-        if Category.objects.filter(category_name = category_name).exists():
+        # Case 1: User selects none → remove offer
+        if offer_id == 'none':
+            category.offer_name = None
+            category.offer_percent = None
+            category.expiry_date = None
+            category.offer_status = 'False'
+
+        # Case 2: Valid offer selected → update offer
+        elif offer_id:
+            offer = Offer.objects.get(id=offer_id)
+            category.offer_name = offer.offer_name
+            category.offer_percent = offer.offer_percent
+            category.expiry_date = offer.expiry_date
+            category.offer_status = 'True'
+
+        # Case 3: No offer_id submitted → keep old offer (no code needed)
+
+        # ---- DUPLICATE CHECK (case-insensitive) ----
+        if Category.objects.filter(category_name__iexact=category_name).exclude(id=id).exists():
             messages.info(request, 'Category Already Exist')
-            return redirect('edit_category',id)
-            # return redirect(request.META.get('HTTP_REFERER'))
-            
-        else:
-            if category_name != None:
-                category.category_name = category_name
+            return redirect('edit_category', id)
 
-            if slug != None:
-                category.slug = slug
-            if description != None:
-                category.description = description
+        # ---- UPDATE NORMAL FIELDS ----
+        category.category_name = category_name    # original case
+        category.slug = slug                     # original case
+        category.description = description        # original case
 
-            category.offer_name = offer_name
-            category.offer_percent = offer_percent
-            category.expiry_date = expiry_date
-            category.offer_status = offer_status
+        category.save()
 
-            category.save()
-            
-
-            
-
-            return redirect('category')
+        return redirect('category')
 
     else:
-        cate = Category.objects.get(id = id)
         offers = Offer.objects.all()
-
-        context = {
-            'category': cate,
-            'offers' : offers
-            
-        }
-        return render(request,'admin/edit_category.html',context)
+        return render(request, 'admin/edit_category.html', {
+            'category': category,
+            'offers': offers
+        })
 
 
 # DELETE CATEGORY

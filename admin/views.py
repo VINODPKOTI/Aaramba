@@ -196,9 +196,8 @@ def adminlogin(request):
         
 @never_cache
 def adminlogout(request):
-    if request.session.has_key('admin'):
-        del request.session['admin']
-        auth.logout(request)
-        return redirect('adminlogin')
+    request.session.pop('admin', None)  # remove custom admin session safely
+    auth.logout(request)                # Django logout
+    return redirect('adminlogin')       # always return a response
 
 

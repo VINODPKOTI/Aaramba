@@ -15,10 +15,4 @@ urlpatterns = [
     path('category_offer_update/', views.category_offer_update, name='category_offer_update'),
     path('category_offer_delete/', views.category_offer_delete, name='category_offer_delete'),
 
-
-    
-
-
-
-
 ]
