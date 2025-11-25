@@ -141,6 +141,7 @@ def delete_product_product(request):
 @never_cache
 def edit_product(request, id):
     if request.method == 'POST':
+        print(request.POST.keys())  # breakpoint here
         product_name = request.POST['product_name']
         slug = product_name.replace(" ", "-")
         mrp = request.POST['mrp']
@@ -159,16 +160,14 @@ def edit_product(request, id):
 
         # id of single images
 
-        pro_image_id1 = request.POST['single_image_id1']
-        pro_image_id2 = request.POST['single_image_id2']
-        pro_image_id3 = request.POST['single_image_id3']
-        pro_image_id4 = request.POST['single_image_id4']
+        pro_image_id1 = request.POST.get('single_image_id1')
+        pro_image_id2 = request.POST.get('single_image_id2')
+        pro_image_id3 = request.POST.get('single_image_id3')
+        pro_image_id4 = request.POST.get('single_image_id4')
+
 
         if request.POST.get('pro_img'):
-
-            
             cover = request.POST.get('pro_img')
-
             format, img = cover.split(';base64,')
             ext = format.split('/')[-1]
             product_cover = ContentFile(base64.b64decode(img), name= product_name + '1.' + ext)
@@ -178,29 +177,20 @@ def edit_product(request, id):
         # updating first image
 
         if request.POST.get('pro_img1'):
-
             new_pro_image1 = request.POST.get('pro_img1')
-
             format, img1 = new_pro_image1.split(';base64,')
             ext = format.split('/')[-1]
             pro_image1 = ContentFile(base64.b64decode(img1), name= product_name + '2.' + ext)
-
             single_image1 = ImageGallery.objects.get(id = pro_image_id1)
             single_image1.image = pro_image1
             single_image1.save()
 
         # updating second image
-
-
         if request.POST.get('pro_img2'):
-
             new_pro_image2 = request.POST.get('pro_img2')
-
-
             format, img2 = new_pro_image2.split(';base64,')
             ext = format.split('/')[-1]
             pro_image2 = ContentFile(base64.b64decode(img2), name= product_name + '3.' + ext)
-
             single_image2 = ImageGallery.objects.get(id = pro_image_id2)
             single_image2.image = pro_image2
             single_image2.save()
@@ -209,36 +199,23 @@ def edit_product(request, id):
 
 
         if request.POST.get('pro_img3'):
-
             new_pro_image3 = request.POST.get('pro_img3')
-
-
             format, img3 = new_pro_image3.split(';base64,')
             ext = format.split('/')[-1]
             pro_image3 = ContentFile(base64.b64decode(img3), name= product_name + '4.' + ext)
-
             single_image3 = ImageGallery.objects.get(id = pro_image_id3)
             single_image3.image = pro_image3
             single_image3.save()
 
         # updating fourth image
-
-
         if request.POST.get('pro_img4'):
-
             new_pro_image4 = request.POST.get('pro_img4')
-
-
             format, img4 = new_pro_image4.split(';base64,')
             ext = format.split('/')[-1]
             pro_image4 = ContentFile(base64.b64decode(img4), name= product_name + '5.' + ext)
-
             single_image4 = ImageGallery.objects.get(id = pro_image_id4)
             single_image4.image = pro_image4
             single_image4.save()
-
-        
-
 
         if  product_name != None:
             product.product_name = product_name
@@ -255,9 +232,6 @@ def edit_product(request, id):
         if stock != None:
             product.stocks = stock
 
-
-
-
         if sub_category_id != None:
             product.sub_category = sub
             product.category = category
@@ -266,10 +240,7 @@ def edit_product(request, id):
             product.description = description
 
         product.save()
-
             # Checking the offer availability
-      
-
         return redirect('product_management')
 
     else:
@@ -291,33 +262,24 @@ def edit_product(request, id):
 # banner management
 
 def banner_management(request):
-
-
     banners = Banner.objects.all()
     context = {
-
         'banners' : banners
-
     }
     return render(request,'admin/banner_management.html', context)
 
 # add banner
 
 def add_banner(request):
-
     if request.method == 'POST':
         image = request.FILES.get('banner_image')
         description = request.POST['product_description']
         product_id = request.POST['product_selected']
         product = Products.objects.get(id = product_id)
         Banner.objects.create(image = image, description = description, product = product)
-
         return redirect('banner_management')
-
     else:
-
         products = Products.objects.all()
-
         context = {
             'products' : products
         }
@@ -328,26 +290,18 @@ def add_banner(request):
 
 @csrf_exempt
 def delete_banner(request):
-
     banner_id = request.POST['banner_id']
     banner = Banner.objects.get(id = banner_id)
     banner.delete()
-
     return JsonResponse('',safe=False)
 
-
-
 # Product Offer apply
-
 @csrf_exempt
 def product_offer_update(request):
-
     offer_id = request.POST.get('offer_id')
     product_id = request.POST.get('product_id')
-
     offer = Offer.objects.get(id = offer_id)
     product = Products.objects.get(id = product_id)
-
     product.offer_name = offer.offer_name
     product.offer_percent = offer.offer_percent
     product.expiry_date = offer.expiry_date
@@ -355,17 +309,11 @@ def product_offer_update(request):
     product.save()
 
     if product.offer_status == 'True':
-
         if product.sub_category.catergory_id.offer_status == 'True':
-
             if product.old_sale_price is not None:
-
                 sale_price = product.old_sale_price
                 print("1 st sale", sale_price)
-
-
             else:
-
                 sale_price = product.sale_price
                 product.old_sale_price = sale_price
                 print("2 st sale", sale_price)   
