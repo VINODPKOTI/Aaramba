@@ -91,49 +91,85 @@ def login(request):
 def register(request):
     if request.method == 'POST':
         form = Registrationform(request.POST)
-        if  form.is_valid():
+
+        if form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             phone_number = form.cleaned_data['phone_number']
             email = form.cleaned_data['email']
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            if Accounts.objects.filter(phone_number = phone_number).exists():
-                messages.info(request,'Phone Number Exists')
-                return redirect('register')
-            if Accounts.objects.filter(email = email).exists():
-                messages.info(request,'Email ID Already Taken')
-                return redirect('register')
+
+            # -----------------------------
+            # 1. Basic validations
+            # -----------------------------
+            if Accounts.objects.filter(username=username).exists():
+                form.add_error('username', 'Username already exists')
+                return render(request, 'user/register.html', {'form': form})
+
+            if Accounts.objects.filter(phone_number=phone_number).exists():
+                form.add_error('phone_number', 'Phone number already exists')
+                return render(request, 'user/register.html', {'form': form})
+
+            if Accounts.objects.filter(email=email).exists():
+                form.add_error('email', 'Email ID already taken')
+                return render(request, 'user/register.html', {'form': form})
+
+            # -----------------------------
+            # 2. Referral code validation BEFORE creating user
+            # -----------------------------
+            entered_referral_code = form.cleaned_data.get('referral_code')
+            referral_user = None
+
+            if entered_referral_code:  # Only check if user entered something
+                referral_user = Accounts.objects.filter(
+                    referral_code=entered_referral_code
+                ).first()
+
+                if referral_user is None:
+                    form.add_error('referral_code', 'Invalid referral code')
+                    return render(request, 'user/register.html', {'form': form})
+
+            # -----------------------------
+            # 3. Create new user safely
+            # -----------------------------
             referral_code = str(uuid.uuid4())[0:8]
-            user = Accounts.objects.create_user(first_name = first_name, last_name = last_name, username = username, email = email, password = password)
+
+            user = Accounts.objects.create_user(
+                first_name=first_name,
+                last_name=last_name,
+                username=username,
+                email=email,
+                password=password
+            )
             user.referral_code = referral_code
             user.phone_number = phone_number
             user.save()
-            # Checking if the referral order
-            if form.cleaned_data['referral_code']:
-                entered_referral_code = form.cleaned_data['referral_code']
-                print(entered_referral_code)
-                if Accounts.objects.get(referral_code = entered_referral_code):
-                    referred_user = Accounts.objects.get(referral_code = entered_referral_code)
-                    referred_user.wallet_amount += 10
-                    user.wallet_amount +=10
-                    referred_user.save()
-                    user.save()
-                else:
-                    pass
-            else:
-                pass
-            messages.success(request,'Registration Successful')
+
+            # -----------------------------
+            # 4. Add wallet amount if referral valid
+            # -----------------------------
+            if referral_user:
+                referral_user.wallet_amount += 10
+                user.wallet_amount += 10
+                referral_user.save()
+                user.save()
+
+            # -----------------------------
+            # 5. Final success
+            # -----------------------------
+            messages.success(request, 'Registration Successful')
             return redirect('register')
+
         else:
-            messages.info(request,'Registration Not Successfuhgjl')
-            return redirect('register')
+            messages.info(request, 'Registration Not Successful')
+            return render(request, 'user/register.html', {'form': form})
+
     else:
         form = Registrationform()
-    context = {
-        'form':form
-    }
-    return render(request, 'user/register.html',context)
+
+    return render(request, 'user/register.html', {'form': form})
+
 
 @never_cache
 def logout(request):

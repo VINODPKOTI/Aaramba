@@ -9,15 +9,8 @@ import uuid
 from django.core.files.base import ContentFile
 import base64
 
-
-
-
-
-
 # Create your views here.
-
 # PRODUCTS MANAGEMENT
-
 def product_management(request):
     products = Products.objects.all().order_by('id')
     category = Category.objects.all()
